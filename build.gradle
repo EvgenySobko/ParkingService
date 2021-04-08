@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'ServerKt'
+mainClassName = 'server.kt'
 task stage {
     dependsOn installDist
 }
