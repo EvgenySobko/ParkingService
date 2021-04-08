@@ -9,7 +9,7 @@ import io.ktor.server.netty.*
 
 fun main() {
     DatabaseFactory.init()
-    embeddedServer(Netty, port = 8006, "bulochka.duckdns.org") {
+    embeddedServer(Netty, port = 8006) {
         routing {
             get("/users") {
                 call.respond("users = ${getUsers()}")
