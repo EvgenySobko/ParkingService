@@ -47,9 +47,22 @@ class Main {
                         } else {
                             call.respond(HttpStatusCode(400, Respond.ICN))
                         }
+
+                    }
+                    post("/pay") {
+                        val payment = Respond.paymentRequest(call.receiveText())
+                        println(payment)
+                        if (Validator.validateCarNumber(payment.carNumber)) {
+                            // TODO: calculate odd due to payment.sum
+                            val dummyOdd = 100
+                            call.respondText(Respond.oddRespond(dummyOdd))
+                        }
+                    }
+                    post("/history") {
+
                     }
                 }
-            }
+            }.start(wait = true)
         }
     }
 }
