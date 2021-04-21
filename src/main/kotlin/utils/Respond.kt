@@ -1,25 +1,44 @@
 package utils
 
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import org.joda.time.DateTime
 import java.time.LocalDateTime
 import java.util.*
 
 object Respond {
 
+    data class CarNumber(
+        @SerializedName("car") val carNumber: String
+    )
+
+    data class Payment(
+        @SerializedName("car") val carNumber: String,
+        @SerializedName("sum") val sum: Int
+    )
+
     const val ICN = "Invalid car number"
     const val CAP = "Car with this number is already parked"
     const val NEM = "Not enough money"
 
-    private data class ParkingTime(val date: String)
-    private data class Summary(val sum: Int)
-    private data class Odd(val odd: Int)
-    private data class Report(
+    data class ParkingTime(val date: String)
+    data class Summary(val sum: Int)
+    data class Odd(val odd: Int)
+    data class ReportItem(
         val carNumber: String,
         val arrivalTime: DateTime,
         val departureTime: DateTime,
         val totalCost: Int
     )
+    data class Report(
+        val lines: List<ReportItem>
+    )
+
+    fun parkingRequest(json: String): String = Gson().fromJson(json, CarNumber::class.java).carNumber
+
+    fun paymentRequest(json: String): Payment = Gson().fromJson(json, Payment::class.java)
+
+    fun historyRequest(json: String): Report = Gson().fromJson(json, Report::class.java)
 
     fun parkingTimeRespond(date: LocalDateTime): String = Gson().toJson(ParkingTime(date.toString()))
 
