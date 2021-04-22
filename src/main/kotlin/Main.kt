@@ -1,8 +1,13 @@
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
+import com.auth0.jwt.algorithms.Algorithm
 import database.DatabaseFactory
 import entities.addParking
 import entities.isCarParkedNow
 import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -17,10 +22,32 @@ class Main {
 
     companion object {
 
+        private val environment = applicationEngineEnvironment {  }
+
+        private val jwtIssuer = environment.config.property("jwt.domain").getString()
+        private val jwtAudience = environment.config.property("jwt.audience").getString()
+        private val jwtRealm = environment.config.property("jwt.realm").getString()
+
+        private val algorithm = Algorithm.HMAC256("secret")
+        private fun makeJwtVerifier(issuer: String, audience: String): JWTVerifier = JWT
+            .require(algorithm)
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .build()
+
         @JvmStatic
         fun main(args: Array<String>) {
             DatabaseFactory().init()
             embeddedServer(Netty, port = 8006) {
+                install(Authentication) {
+                    jwt {
+                        realm = jwtRealm
+                        verifier(makeJwtVerifier(jwtIssuer, jwtAudience))
+                        validate { credential ->
+                            if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
+                        }
+                    }
+                }
                 routing {
                     post("/park") {
                         val carNumber: String = Respond.parkingRequest(call.receiveText())
@@ -34,8 +61,6 @@ class Main {
                         } else {
                             call.respond(HttpStatusCode(400, Respond.ICN))
                         }
-
-
                     }
                     post("/unpark") {
                         val carNumber: String = Respond.parkingRequest(call.receiveText())
@@ -48,7 +73,6 @@ class Main {
                         } else {
                             call.respond(HttpStatusCode(400, Respond.ICN))
                         }
-
                     }
                     post("/pay") {
                         val payment = Respond.paymentRequest(call.receiveText())

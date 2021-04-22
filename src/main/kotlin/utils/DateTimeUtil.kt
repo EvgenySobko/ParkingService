@@ -1,9 +1,9 @@
 package utils
 
-import java.time.LocalDateTime
+import org.joda.time.DateTime
 
 object DateTimeUtil {
 
-    fun getCurrentDateAndTime(): LocalDateTime = LocalDateTime.now()
+    fun getCurrentDateAndTime(): DateTime = DateTime.now()
 
 }
