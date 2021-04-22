@@ -4,6 +4,6 @@ import java.sql.Timestamp
 
 object DateTimeUtil {
 
-    fun getCurrentDateAndTime(): LocalDateTime = LocalDateTime.now()
+    fun getCurrentDateAndTime(): Long = Timestamp(System.currentTimeMillis()).toInstant().epochSecond
 
 }
