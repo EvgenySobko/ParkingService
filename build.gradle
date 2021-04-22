@@ -27,7 +27,7 @@ dependencies {
     implementation "io.ktor:ktor-auth-jwt:1.5.3"
     implementation "com.zaxxer:HikariCP:4.0.3"
     implementation "ch.qos.logback:logback-classic:1.2.3"
-    compile 'org.jetbrains.exposed:exposed:0.8.5'
+    compile 'org.jetbrains.exposed:exposed:0.10.4'
     compile 'org.postgresql:postgresql:42.2.10'
     compile 'joda-time:joda-time:2.10.10'
     compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'

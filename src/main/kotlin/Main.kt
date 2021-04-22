@@ -1,4 +1,3 @@
-
 import database.DatabaseFactory
 import entities.*
 import io.ktor.application.*
@@ -52,12 +51,8 @@ class Main {
                         val payment = Respond.paymentRequest(call.receiveText())
                         println(payment)
                         if (Validator.validateCarNumber(payment.carNumber)) {
-                            if (!isCarParkedNow(payment.carNumber))
-                                call.respond(HttpStatusCode(400, Respond.CNP))
-                            else {
-                                val odd = calculateOdd(payment.carNumber, payment.sum)
-                                call.respondText(Respond.oddRespond(odd))
-                            }
+                            val odd = calculateOdd(payment.carNumber, payment.sum)
+                            call.respondText(Respond.oddRespond(odd))
                         }
                     }
                     post("/history") {

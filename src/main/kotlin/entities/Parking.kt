@@ -86,23 +86,27 @@ fun addParking(carNumber: String) {
 
 fun calculateSummary(carNumber: String): Int {
     val userId = getUserId(carNumber)
-    var diff: Long = -1
+    var sum = -1
     transaction {
+        addLogger(StdOutSqlLogger)
         var parkingId: Int
         var arrTime: Long
         Parking.select { Parking.userId eq userId and (Parking.departureTime eq null) }.forEach {
             arrTime = it[Parking.arrivalTime]
             parkingId = it[Parking.id]
-            Parking.update({ Parking.userId eq parkingId }) { p ->
+            Parking.update({ Parking.id eq parkingId }) { p ->
                 val depTime = DateTimeUtil.getCurrentDateAndTime()
                 p[departureTime] = depTime
-                diff = depTime - arrTime
+                val diff = ((depTime - arrTime) / 1000 / 60 / 60).toInt()
+                sum = if (diff == 0) Respond.COST_PER_HOUR * 1
+                else Respond.COST_PER_HOUR * diff
+            }
+            Parking.update({Parking.id eq parkingId}) { p->
+                p[totalCost] = sum
             }
         }
     }
-    val hours = if ((diff / 1000 / 60 / 60).toInt() == 0) 1 else (diff / 1000 / 60 / 60).toInt()
-    println(hours)
-    return Respond.COST_PER_HOUR * hours
+    return sum
 }
 
 fun calculateOdd(carNumber: String, sum: Int): Int {
