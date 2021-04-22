@@ -1,24 +1,23 @@
 package entities
 
 import com.google.gson.Gson
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.joda.time.DateTime
 import utils.DateTimeUtil
+import utils.Respond
 
 object Parking : Table("schema.parking") {
     val id = integer("id").primaryKey().autoIncrement("schema.parking_id_seq")
-    val arrivalTime = date("arrival_time")
-    val departureTime = date("departure_time").nullable()
+    val arrivalTime = long("arrival_time")
+    val departureTime = long("departure_time").nullable()
     val totalCost = integer("total_cost")
     val userId = integer("user_id")
 }
 
 data class ParkingLot(
     val id: Int,
-    val arrivalTime: DateTime,
-    val departureTime: DateTime?,
+    val arrivalTime: Long,
+    val departureTime: Long?,
     val totalCost: Int,
     val userId: Int
 )
@@ -83,4 +82,37 @@ fun addParking(carNumber: String) {
             it[userId] = getUserId(carNumber)
         }
     }
+}
+
+fun calculateSummary(carNumber: String): Int {
+    val userId = getUserId(carNumber)
+    var diff: Long = -1
+    transaction {
+        var parkingId: Int
+        var arrTime: Long
+        Parking.select { Parking.userId eq userId and (Parking.departureTime eq null) }.forEach {
+            arrTime = it[Parking.arrivalTime]
+            parkingId = it[Parking.id]
+            Parking.update({ Parking.userId eq parkingId }) { p ->
+                val depTime = DateTimeUtil.getCurrentDateAndTime()
+                p[departureTime] = depTime
+                diff = depTime - arrTime
+            }
+        }
+    }
+    val hours = if ((diff / 1000 / 60 / 60).toInt() == 0) 1 else (diff / 1000 / 60 / 60).toInt()
+    println(hours)
+    return Respond.COST_PER_HOUR * hours
+}
+
+fun calculateOdd(carNumber: String, sum: Int): Int {
+    val userId = getUserId(carNumber)
+    var odd = 0
+    transaction {
+        val parkings = Parking.select { Parking.userId eq userId}.toMutableList()
+        parkings.sortByDescending { it[Parking.departureTime] }
+        val costSum = parkings.first()[Parking.totalCost]
+        odd = sum - costSum
+    }
+    return odd
 }

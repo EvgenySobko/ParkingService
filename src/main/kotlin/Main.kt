@@ -1,7 +1,5 @@
-
 import database.DatabaseFactory
-import entities.addParking
-import entities.isCarParkedNow
+import entities.*
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -9,9 +7,8 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import utils.DateTimeUtil
-import utils.Respond
-import utils.Validator
+import org.joda.time.DateTime
+import utils.*
 
 class Main {
 
@@ -25,26 +22,27 @@ class Main {
                     post("/park") {
                         val carNumber: String = Respond.parkingRequest(call.receiveText())
                         if (Validator.validateCarNumber(carNumber)) {
-                            if (isCarParkedNow(carNumber)) call.respond(HttpStatusCode(400, Respond.CAP))
+                            if (isCarParkedNow(carNumber))
+                                call.respond(HttpStatusCode(400, Respond.CAP))
                             else {
                                 addParking(carNumber)
                                 call.response.status(HttpStatusCode.OK)
-                                call.respondText(Respond.parkingTimeRespond(DateTimeUtil.getCurrentDateAndTime()))
+                                call.respondText(Respond.parkingTimeRespond(DateTime.now()))
                             }
                         } else {
                             call.respond(HttpStatusCode(400, Respond.ICN))
                         }
-
-
                     }
                     post("/unpark") {
                         val carNumber: String = Respond.parkingRequest(call.receiveText())
                         println(carNumber)
                         if (Validator.validateCarNumber(carNumber)) {
-                            // TODO: checkIfCarIsNotParked
-                            // TODO: calculateSummary
-                            val dummySummary = 1000
-                            call.respondText(Respond.summaryRespond(dummySummary))
+                            if (!isCarParkedNow(carNumber))
+                                call.respond(HttpStatusCode(400, Respond.CNP))
+                            else {
+                                val sum: Int = calculateSummary(carNumber)
+                                call.respondText(Respond.summaryRespond(sum))
+                            }
                         } else {
                             call.respond(HttpStatusCode(400, Respond.ICN))
                         }
@@ -54,9 +52,12 @@ class Main {
                         val payment = Respond.paymentRequest(call.receiveText())
                         println(payment)
                         if (Validator.validateCarNumber(payment.carNumber)) {
-                            // TODO: calculate odd due to payment.sum
-                            val dummyOdd = 100
-                            call.respondText(Respond.oddRespond(dummyOdd))
+                            if (!isCarParkedNow(payment.carNumber))
+                                call.respond(HttpStatusCode(400, Respond.CNP))
+                            else {
+                                val odd = calculateOdd(payment.carNumber, payment.sum)
+                                call.respondText(Respond.oddRespond(odd))
+                            }
                         }
                     }
                     post("/history") {
