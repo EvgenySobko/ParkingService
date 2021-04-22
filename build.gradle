@@ -3,7 +3,6 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'Main'
 task stage {
     dependsOn installDist
 }
@@ -48,5 +47,5 @@ compileTestKotlin {
 }
 
 application {
-    mainClassName = 'ServerKt'
+    mainClassName = 'MainKt'
 }
