@@ -1,6 +1,6 @@
 package utils
 
-import java.time.LocalDateTime
+import java.sql.Timestamp
 
 object DateTimeUtil {
 

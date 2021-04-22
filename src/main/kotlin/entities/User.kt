@@ -1,10 +1,6 @@
 package entities
 
-import com.google.gson.Gson
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
-import utils.Respond
 
 object Users : Table("schema.user") {
     val id = integer("id").primaryKey().autoIncrement("schema.user_id_seq1")
