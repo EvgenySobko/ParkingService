@@ -40,7 +40,7 @@ object Respond {
 
     fun historyRequest(json: String): Report = Gson().fromJson(json, Report::class.java)
 
-    fun parkingTimeRespond(date: LocalDateTime): String = Gson().toJson(ParkingTime(date.toString()))
+    fun parkingTimeRespond(date: DateTime): String = Gson().toJson(ParkingTime(date.toString()))
 
     fun summaryRespond(sum: Int): String = Gson().toJson(Summary(sum))
 

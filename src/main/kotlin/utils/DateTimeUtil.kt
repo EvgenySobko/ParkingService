@@ -2,7 +2,7 @@ package utils
 
 import java.time.LocalDateTime
 
-object DateTime {
+object DateTimeUtil {
 
     fun getCurrentDateAndTime(): LocalDateTime = LocalDateTime.now()
 

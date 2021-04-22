@@ -1,5 +1,7 @@
 
 import database.DatabaseFactory
+import entities.addParking
+import entities.isCarParkedNow
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -7,7 +9,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import utils.DateTime
+import utils.DateTimeUtil
 import utils.Respond
 import utils.Validator
 
@@ -20,16 +22,15 @@ class Main {
             DatabaseFactory().init()
             embeddedServer(Netty, port = 8006) {
                 routing {
-                    get("/users") {
-                        call.respond("getUsers()")
-                    }
                     post("/park") {
                         val carNumber: String = Respond.parkingRequest(call.receiveText())
-                        println(carNumber)
                         if (Validator.validateCarNumber(carNumber)) {
-                            // TODO: registerParking()
-                            call.response.status(HttpStatusCode.OK)
-                            call.respondText(Respond.parkingTimeRespond(DateTime.getCurrentDateAndTime()))
+                            if (isCarParkedNow(carNumber)) call.respond(HttpStatusCode(400, Respond.CAP))
+                            else {
+                                addParking(carNumber)
+                                call.response.status(HttpStatusCode.OK)
+                                call.respondText(Respond.parkingTimeRespond(DateTimeUtil.getCurrentDateAndTime()))
+                            }
                         } else {
                             call.respond(HttpStatusCode(400, Respond.ICN))
                         }
