@@ -3,6 +3,7 @@ plugins {
     id 'application'
 }
 
+mainClassName = 'Main'
 task stage {
     dependsOn installDist
 }
@@ -44,8 +45,4 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = '1.8'
-}
-
-application {
-    mainClassName = 'MainKt'
 }
