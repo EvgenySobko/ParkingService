@@ -23,6 +23,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2'
     implementation "io.ktor:ktor-server-core:1.5.3"
     implementation "io.ktor:ktor-server-netty:1.5.3"
+    implementation "io.ktor:ktor-auth:1.5.3"
+    implementation "io.ktor:ktor-auth-jwt:1.5.3"
     implementation "com.zaxxer:HikariCP:4.0.3"
     implementation "ch.qos.logback:logback-classic:1.2.3"
     compile 'org.jetbrains.exposed:exposed:0.8.5'
@@ -43,8 +45,4 @@ compileKotlin {
 
 compileTestKotlin {
     kotlinOptions.jvmTarget = '1.8'
-}
-
-application {
-    mainClassName = 'ServerKt'
 }

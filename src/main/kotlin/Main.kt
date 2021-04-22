@@ -1,3 +1,4 @@
+
 import database.DatabaseFactory
 import entities.*
 import io.ktor.application.*
@@ -46,7 +47,6 @@ class Main {
                         } else {
                             call.respond(HttpStatusCode(400, Respond.ICN))
                         }
-
                     }
                     post("/pay") {
                         val payment = Respond.paymentRequest(call.receiveText())
