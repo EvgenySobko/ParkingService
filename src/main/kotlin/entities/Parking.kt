@@ -6,8 +6,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import utils.DateTimeUtil
 import utils.Respond
 
-object Parking : Table("schema.parking") {
-    val id = integer("id").primaryKey().autoIncrement("schema.parking_id_seq")
+object Parking : Table("public.parking") {
+    val id = integer("id").primaryKey().autoIncrement("public.parking_id_seq")
     val arrivalTime = long("arrival_time")
     val departureTime = long("departure_time").nullable()
     val totalCost = integer("total_cost")

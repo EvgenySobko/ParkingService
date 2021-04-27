@@ -1,6 +1,15 @@
+
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
+import com.auth0.jwt.algorithms.Algorithm
 import database.DatabaseFactory
-import entities.*
+import entities.addParking
+import entities.calculateOdd
+import entities.calculateSummary
+import entities.isCarParkedNow
 import io.ktor.application.*
+import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -8,17 +17,41 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.joda.time.DateTime
-import utils.*
+import utils.Respond
+import utils.Validator
 
 class Main {
 
     companion object {
+
+        private val algorithm = Algorithm.HMAC256("secret")
+
+        private fun makeJwtVerifier(issuer: String, audience: String): JWTVerifier = JWT
+            .require(algorithm)
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .build()
 
         @JvmStatic
         fun main(args: Array<String>) {
             DatabaseFactory().init()
             embeddedServer(Netty, port = 8006) {
                 routing {
+
+                    val jwtIssuer = "https://jwt-provider-domain/"
+                    val jwtAudience = "jwt-audience"
+                    val jwtRealm = "ParkingService"
+
+                    install(Authentication) {
+                        jwt {
+                            realm = jwtRealm
+                            verifier(makeJwtVerifier(jwtIssuer, jwtAudience))
+                            validate { credential ->
+                                if (credential.payload.audience.contains(jwtAudience)) JWTPrincipal(credential.payload) else null
+                            }
+                        }
+                    }
+
                     post("/park") {
                         val carNumber: String = Respond.parkingRequest(call.receiveText())
                         if (Validator.validateCarNumber(carNumber)) {
@@ -56,7 +89,15 @@ class Main {
                         }
                     }
                     post("/history") {
-
+                        install(Authentication) {
+                            basic("auth-basic") {
+                                realm = "Access to the '/history' path"
+                                validate {
+                                    if (it.name == "" && it.password == "") UserIdPrincipal(it.name)
+                                    else null
+                                }
+                            }
+                        }
                     }
                 }
             }.start(wait = true)
