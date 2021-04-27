@@ -1,9 +1,8 @@
 package utils
 
-import org.joda.time.DateTime
+import java.sql.Timestamp
 
 object DateTimeUtil {
 
-    fun getCurrentDateAndTime(): DateTime = DateTime.now()
-
+    fun getCurrentDateAndTime(): Long = Timestamp(System.currentTimeMillis()).toInstant().epochSecond
 }

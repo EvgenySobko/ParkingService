@@ -3,8 +3,6 @@ package utils
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import org.joda.time.DateTime
-import java.time.LocalDateTime
-import java.util.*
 
 object Respond {
 
@@ -17,7 +15,10 @@ object Respond {
         @SerializedName("sum") val sum: Int
     )
 
+    const val COST_PER_HOUR = 150
+
     const val ICN = "Invalid car number"
+    const val CNP = "Car with this number is not parked"
     const val CAP = "Car with this number is already parked"
     const val NEM = "Not enough money"
 
