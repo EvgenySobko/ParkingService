@@ -2,7 +2,7 @@ package entities
 
 import org.jetbrains.exposed.sql.Table
 
-object Users : Table("public.user") {
+object Users : Table("user") {
     val id = integer("id").primaryKey().autoIncrement("public.user_id_seq1")
     val carNumber = text("number")
     val token = text("token")
