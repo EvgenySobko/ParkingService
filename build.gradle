@@ -25,6 +25,7 @@ dependencies {
     implementation "io.ktor:ktor-auth:1.5.3"
     implementation "io.ktor:ktor-auth-jwt:1.5.3"
     implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "io.ktor:ktor-network-tls-certificates:1.5.3"
     compile 'org.jetbrains.exposed:exposed:0.10.4'
     compile 'org.postgresql:postgresql:42.2.10'
     compile 'joda-time:joda-time:2.10.10'
@@ -36,6 +37,13 @@ dependencies {
 test {
     useJUnit()
 }
+
+task generateJks(type: JavaExec, dependsOn: 'classes') {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'io.ktor.samples.http2.CertificateGenerator'
+}
+
+getTasksByName("run", false).first().dependsOn('generateJks')
 
 compileKotlin {
     kotlinOptions.jvmTarget = '1.8'

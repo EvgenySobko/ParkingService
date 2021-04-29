@@ -22,8 +22,4 @@ object Validator {
             ValidationResult.PARKED
         else ValidationResult.NOT_PARKED
     }
-
-
-
-
 }
