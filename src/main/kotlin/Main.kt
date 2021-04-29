@@ -55,8 +55,10 @@ class Main {
                     post("/park") {
                         val carNumber: String = Respond.parkingRequest(call.receiveText())
                         if (Validator.validateCarNumber(carNumber)) {
-                            if (isCarParkedNow(carNumber))
-                                call.respond(HttpStatusCode(400, Respond.CAP))
+                            if (isCarParkedNow(carNumber)) {
+                                call.response.status(HttpStatusCode.BadRequest)
+                                call.respondText(Respond.CAP)
+                            }
                             else {
                                 addParking(carNumber)
                                 call.response.status(HttpStatusCode.OK)
