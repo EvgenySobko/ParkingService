@@ -2,6 +2,7 @@ package utils
 
 import com.google.gson.Gson
 import org.joda.time.DateTime
+import java.util.*
 
 object Respond {
 
@@ -11,6 +12,7 @@ object Respond {
     const val IUT = "Invalid user token"
     const val CNP = "Car with this number is not parked"
     const val CAP = "Car with this number is already parked"
+    const val CSP = "Car is still on parking, you should unpark it before payment"
     const val NEM = "Not enough money"
 
     data class ParkingTime(val date: String)
@@ -19,9 +21,9 @@ object Respond {
     data class Odd(val odd: Int)
     data class ReportItem(
         val carNumber: String,
-        val arrivalTime: DateTime,
-        val departureTime: DateTime,
-        val totalCost: Int
+        val arrivalTime: Long,
+        val departureTime: Long?,
+        val totalCost: Int?
     )
     data class Report(
         val lines: List<ReportItem>
@@ -35,5 +37,5 @@ object Respond {
 
     fun odd(odd: Int): String = Gson().toJson(Odd(odd))
 
-    fun historyRespond(reportLines: List<ReportItem>): String  = Gson().toJson(Report(reportLines))
+    fun history(reportLines: List<ReportItem>): String  = Gson().toJson(Report(reportLines))
 }

@@ -3,6 +3,7 @@ package entities
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import utils.TokenGenerator.genToken
 
@@ -13,6 +14,16 @@ object Users : Table("user") {
 }
 
 data class User(val id: Int, val carNumber: String, val token: String)
+
+fun getUser(userId: Int): User? {
+    var user: User? = null
+    transaction {
+        Users.select { Users.id eq userId }.map {
+            user = User(it[Users.id], it[Users.carNumber], it[Users.token])
+        }
+    }
+    return user
+}
 
 fun addNewUser(carNum: String): User {
     var id: Int = 0
@@ -42,4 +53,12 @@ fun isTokenValid(userId: Int, userToken: String): Boolean {
         token = Users.slice(Users.token).select { Users.id eq userId }.map { it[Users.token] }.first()
     }
     return userToken == token
+}
+
+fun isTokenAlreadyUsed(token: String): Boolean {
+    var res = false
+    transaction {
+        res = Users.selectAll().map { it[Users.token] }.contains(token)
+    }
+    return res
 }

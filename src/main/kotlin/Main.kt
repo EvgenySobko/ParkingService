@@ -1,8 +1,5 @@
 import database.DatabaseFactory
-import entities.addNewUser
-import entities.addParking
-import entities.calculateOdd
-import entities.calculateSummary
+import entities.*
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -25,6 +22,15 @@ class Main {
         fun main(args: Array<String>) {
             DatabaseFactory().init()
             embeddedServer(Netty, port = 8006) {
+                install(Authentication) {
+                    basic("auth-basic") {
+                        realm = "Access to the '/history' path"
+                        validate {
+                            if (it.name == "admin" && it.password == "admin") UserIdPrincipal(it.name)
+                            else null
+                        }
+                    }
+                }
                 routing {
                     post("/park") {
                         val token = call.request.headers["auth_token"]
@@ -88,23 +94,20 @@ class Main {
                                 call.respond(HttpStatusCode(400, Respond.IUT))
                             }
                             ValidationResult.NOT_PARKED -> {
-                                call.respond(HttpStatusCode(400, Respond.CNP))
-                            }
-                            ValidationResult.PARKED -> {
                                 val odd = calculateOdd(payment.carNumber, payment.sum)
                                 call.respondText(Respond.odd(odd))
                             }
+                            ValidationResult.PARKED -> {
+                                call.respond(HttpStatusCode(400, Respond.CSP))
+                            }
                         }
                     }
-                    post("/history") {
-                        install(Authentication) {
-                            basic("auth-basic") {
-                                realm = "Access to the '/history' path"
-                                validate {
-                                    if (it.name == "" && it.password == "") UserIdPrincipal(it.name)
-                                    else null
-                                }
-                            }
+                    authenticate("auth-basic") {
+                        get("/history") {
+                            if (call.principal<UserIdPrincipal>()?.name == "admin")
+                                call.respondText(Respond.history(getReport()))
+                            else
+                                call.respond(HttpStatusCode.Unauthorized)
                         }
                     }
                 }

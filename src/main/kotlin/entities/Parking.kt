@@ -43,8 +43,6 @@ fun getParking(): String {
     return json
 }
 
-
-
 fun isCarParkedNow(userId: Int): Boolean {
     var isParkedNow = false
     transaction {
@@ -91,7 +89,7 @@ fun calculateSummary(carNumber: String): Int {
                 sum = if (diff == 0) Respond.COST_PER_HOUR * 1
                 else Respond.COST_PER_HOUR * diff
             }
-            Parking.update({Parking.id eq parkingId}) { p->
+            Parking.update({ Parking.id eq parkingId }) { p ->
                 p[totalCost] = sum
             }
         }
@@ -103,10 +101,28 @@ fun calculateOdd(carNumber: String, sum: Int): Int {
     val userId = getUserId(carNumber)!!
     var odd = 0
     transaction {
-        val parkings = Parking.select { Parking.userId eq userId}.toMutableList()
+        val parkings = Parking.select { Parking.userId eq userId }.toMutableList()
         parkings.sortByDescending { it[Parking.departureTime] }
         val costSum = parkings.first()[Parking.totalCost]
         odd = sum - costSum
     }
     return odd
+}
+
+fun getReport(): List<Respond.ReportItem> {
+    val list = mutableListOf<Respond.ReportItem>()
+    transaction {
+        Parking.selectAll().map {
+            val user = getUser(it[Parking.userId])!!
+            list.add(
+                Respond.ReportItem(
+                    carNumber = user.carNumber,
+                    arrivalTime = it[Parking.arrivalTime],
+                    departureTime = it[Parking.departureTime],
+                    totalCost = it[Parking.totalCost]
+                )
+            )
+        }
+    }
+    return list
 }
