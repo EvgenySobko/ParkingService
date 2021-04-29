@@ -43,32 +43,12 @@ fun getParking(): String {
     return json
 }
 
-fun addUser(carNum: String): Int {
-    var id: Int = 0
-    transaction {
-        val r: Number? = Users.insert {
-            it[carNumber] = carNum
-        }.generatedKey
-        id = r!!.toInt()
-    }
-    println(id)
-    return id
-}
 
-fun getUserId(carNumber: String): Int {
-    var id: Int? = null
-    transaction {
-        val row = Users.select { Users.carNumber eq carNumber }.limit(1)
-        row.forEach { id = it[Users.id] }
-    }
-    return id ?: addUser(carNumber)
-}
 
-fun isCarParkedNow(carNumber: String): Boolean {
+fun isCarParkedNow(userId: Int): Boolean {
     var isParkedNow = false
-    val id = getUserId(carNumber)
     transaction {
-        val carsParked = Parking.select { Parking.userId eq id and (Parking.departureTime eq null) }
+        val carsParked = Parking.select { Parking.userId eq userId and (Parking.departureTime eq null) }
         if (!carsParked.empty()) isParkedNow = true
     }
     return isParkedNow
@@ -79,13 +59,23 @@ fun addParking(carNumber: String) {
         Parking.insert {
             it[arrivalTime] = DateTimeUtil.getCurrentDateAndTime()
             it[departureTime] = null
-            it[userId] = getUserId(carNumber)
+            it[userId] = getUserId(carNumber)!!
+        }
+    }
+}
+
+fun addParking(user: User) {
+    transaction {
+        Parking.insert {
+            it[arrivalTime] = DateTimeUtil.getCurrentDateAndTime()
+            it[departureTime] = null
+            it[userId] = user.id
         }
     }
 }
 
 fun calculateSummary(carNumber: String): Int {
-    val userId = getUserId(carNumber)
+    val userId = getUserId(carNumber)!!
     var sum = -1
     transaction {
         addLogger(StdOutSqlLogger)
@@ -110,7 +100,7 @@ fun calculateSummary(carNumber: String): Int {
 }
 
 fun calculateOdd(carNumber: String, sum: Int): Int {
-    val userId = getUserId(carNumber)
+    val userId = getUserId(carNumber)!!
     var odd = 0
     transaction {
         val parkings = Parking.select { Parking.userId eq userId}.toMutableList()
