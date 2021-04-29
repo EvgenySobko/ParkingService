@@ -1,28 +1,20 @@
 package utils
 
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import org.joda.time.DateTime
 
 object Respond {
 
-    data class CarNumber(
-        @SerializedName("car") val carNumber: String
-    )
-
-    data class Payment(
-        @SerializedName("car") val carNumber: String,
-        @SerializedName("sum") val sum: Int
-    )
-
     const val COST_PER_HOUR = 150
 
     const val ICN = "Invalid car number"
+    const val IUT = "Invalid user token"
     const val CNP = "Car with this number is not parked"
     const val CAP = "Car with this number is already parked"
     const val NEM = "Not enough money"
 
     data class ParkingTime(val date: String)
+    data class ParkingTimeWithToken(val date: String, val token: String)
     data class Summary(val sum: Int)
     data class Odd(val odd: Int)
     data class ReportItem(
@@ -35,15 +27,13 @@ object Respond {
         val lines: List<ReportItem>
     )
 
-    fun parkingRequest(json: String): String = Gson().fromJson(json, CarNumber::class.java).carNumber
+    fun parkingTime(date: DateTime): String = Gson().toJson(ParkingTime(date.toString()))
 
-    fun paymentRequest(json: String): Payment = Gson().fromJson(json, Payment::class.java)
+    fun parkingTimeWithToken(date: DateTime, token: String): String = Gson().toJson(ParkingTimeWithToken(date.toString(), token))
 
-    fun historyRequest(json: String): Report = Gson().fromJson(json, Report::class.java)
+    fun summary(sum: Int): String = Gson().toJson(Summary(sum))
 
-    fun parkingTimeRespond(date: DateTime): String = Gson().toJson(ParkingTime(date.toString()))
+    fun odd(odd: Int): String = Gson().toJson(Odd(odd))
 
-    fun summaryRespond(sum: Int): String = Gson().toJson(Summary(sum))
-
-    fun oddRespond(odd: Int): String = Gson().toJson(Odd(odd))
+    fun historyRespond(reportLines: List<ReportItem>): String  = Gson().toJson(Report(reportLines))
 }
