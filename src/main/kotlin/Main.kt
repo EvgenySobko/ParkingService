@@ -1,3 +1,4 @@
+
 import database.DatabaseFactory
 import entities.*
 import io.ktor.application.*
@@ -21,7 +22,7 @@ class Main {
         @JvmStatic
         fun main(args: Array<String>) {
             DatabaseFactory().init()
-            embeddedServer(Netty, 8006) {
+            embeddedServer(Netty, 8007) {
                 install(Authentication) {
                     basic("auth-basic") {
                         realm = "Access to the '/history' path"
