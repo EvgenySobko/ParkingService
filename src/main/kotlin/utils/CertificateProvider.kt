@@ -6,7 +6,7 @@ import io.ktor.server.engine.*
 import java.io.File
 import java.security.KeyStore
 
-object CertificateGenerator {
+object CertificateProvider {
 
     fun ApplicationEngineEnvironmentBuilder.installCertificates() {
         val keystore = buildKeyStore {
@@ -17,34 +17,20 @@ object CertificateGenerator {
                 password = PASS
             }
         }
-        sslConnector(keystore, ALIAS, { "".toCharArray() }, { PASS.toCharArray() }) {
+        sslConnector(keystore, ALIAS, { PASS.toCharArray() }, { PASS.toCharArray() }) {
             port = 8007
             keyStorePath = keystore.asFile.absoluteFile
         }
     }
 
-    private const val ALIAS = "cert"
-    private const val PASS = "12345"
-
     private val KeyStore.asFile: File
         get() {
-            val keyStoreFile = File("build/cert.jks")
+            val keyStoreFile = File(KEYSTORE)
             this.saveToFile(keyStoreFile, PASS)
             return keyStoreFile
         }
 
-
-    /**
-     * This one is just for creating certificates
-     * **/
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val jksFile = File("build/cert.jks").apply {
-            parentFile.mkdirs()
-        }
-
-        if (!jksFile.exists()) {
-            generateCertificate(jksFile) // Generates the certificate
-        }
-    }
+    private const val ALIAS = "myalias"
+    private const val PASS = "mypass"
+    private const val KEYSTORE = "/etc/letsencrypt/live/mydomain.com/keystore.jks"
 }
