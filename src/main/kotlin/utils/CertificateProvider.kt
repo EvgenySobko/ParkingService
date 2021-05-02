@@ -32,5 +32,5 @@ object CertificateProvider {
 
     private const val ALIAS = "myalias"
     private const val PASS = "mypass"
-    private const val KEYSTORE = "/etc/letsencrypt/live/mydomain.com/keystore.jks"
+    private const val KEYSTORE = "/etc/letsencrypt/live/bulochka.duckdns.org/keystore.jks"
 }
