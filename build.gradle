@@ -8,7 +8,7 @@ task stage {
 }
 
 application {
-    mainClass = 'MainKt'
+    mainClass = 'ApplicationKt'
 }
 
 group = 'parking_service'
@@ -39,12 +39,6 @@ dependencies {
 
 test {
     useJUnit()
-}
-
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "MainKt"
-    }
 }
 
 getTasksByName("run", false).first().dependsOn('generateJks')

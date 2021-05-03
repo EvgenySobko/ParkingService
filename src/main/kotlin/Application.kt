@@ -1,3 +1,4 @@
+@file:JvmName("Application")
 
 import database.DatabaseFactory
 import entities.*
