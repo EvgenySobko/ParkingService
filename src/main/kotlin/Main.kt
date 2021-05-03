@@ -89,6 +89,7 @@ class Main {
                 }
                 post("/unpark") {
                     val token = call.request.headers["auth_token"]
+                    println(token)
                     val car = Request.parking(call.receiveText())
                     when (Validator.validate(car.carNumber, token)) {
                         ValidationResult.INV_NUM -> {
