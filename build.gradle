@@ -39,14 +39,6 @@ test {
     useJUnit()
 }
 
-task fatJar(type: Jar) {
-    manifest {
-        attributes 'Main-Class': 'MainKt'
-    }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
 getTasksByName("run", false).first().dependsOn('generateJks')
 
 compileKotlin {
