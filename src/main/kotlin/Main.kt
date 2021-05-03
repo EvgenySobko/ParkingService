@@ -13,13 +13,44 @@ import utils.Request
 import utils.Respond
 import utils.ValidationResult
 import utils.Validator
+import java.io.File
+import java.security.KeyStore
 
-fun main(args: Array<String>) = EngineMain.main(args)
+class Main {
 
-fun Application.module() {
-    DatabaseFactory().init()
-    embeddedServer(Netty, applicationEngineEnvironment {
-        module {
+    companion object {
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            DatabaseFactory().init()
+            val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+            val environment = applicationEngineEnvironment {
+                connectors.add(
+                    object : EngineConnectorBuilder(ConnectorType.HTTP) {
+                        override var port: Int
+                            get() = 8006
+                            set(value) {}
+                    }
+                )
+                keyStore.load(
+                    File("/etc/letsencrypt/live/bulochka.duckdns.org/keystore.jks").inputStream(), "mypass".toCharArray()
+                )
+                val engine = EngineSSLConnectorBuilder(
+                    keyStore = keyStore,
+                    keyAlias = "myalias",
+                    keyStorePassword = { "mypass".toCharArray() },
+                    privateKeyPassword = { "mypass".toCharArray() },
+                )
+                engine.port = 8007
+                connectors.add(engine)
+
+                module { module() }
+            }
+
+            embeddedServer(factory = Netty, environment = environment).start(wait = true)
+        }
+
+        private fun Application.module() {
             install(Authentication) {
                 basic("auth-basic") {
                     realm = "Access to the '/history' path"
@@ -110,5 +141,5 @@ fun Application.module() {
                 }
             }
         }
-    }).start(wait = true)
+    }
 }
