@@ -39,18 +39,12 @@ test {
     useJUnit()
 }
 
-jar {
+task fatJar(type: Jar) {
     manifest {
-        attributes(
-                'Main-Class': 'ApplicationKt'
-        )
+        attributes 'Main-Class': 'ApplicationKt'
     }
-
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 getTasksByName("run", false).first().dependsOn('generateJks')
