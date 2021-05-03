@@ -1,9 +1,6 @@
 package entities
 
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import utils.TokenGenerator.genToken
 
@@ -18,6 +15,7 @@ data class User(val id: Int, val carNumber: String, val token: String)
 fun getUser(userId: Int): User? {
     var user: User? = null
     transaction {
+        addLogger(StdOutSqlLogger)
         Users.select { Users.id eq userId }.map {
             user = User(it[Users.id], it[Users.carNumber], it[Users.token])
         }
@@ -29,6 +27,7 @@ fun addNewUser(carNum: String): User {
     var id: Int = 0
     val t = genToken()
     transaction {
+        addLogger(StdOutSqlLogger)
         val r: Number? = Users.insert {
             it[carNumber] = carNum
             it[token] = t
@@ -41,6 +40,7 @@ fun addNewUser(carNum: String): User {
 fun getUserId(carNumber: String): Int? {
     var id: Int? = null
     transaction {
+        addLogger(StdOutSqlLogger)
         val row = Users.select { Users.carNumber eq carNumber }.limit(1)
         row.forEach { id = it[Users.id] }
     }
@@ -50,6 +50,7 @@ fun getUserId(carNumber: String): Int? {
 fun isTokenValid(userId: Int, userToken: String): Boolean {
     var token: String? = null
     transaction {
+        addLogger(StdOutSqlLogger)
         token = Users.slice(Users.token).select { Users.id eq userId }.map { it[Users.token] }.first()
     }
     return userToken == token
@@ -58,6 +59,7 @@ fun isTokenValid(userId: Int, userToken: String): Boolean {
 fun isTokenAlreadyUsed(token: String): Boolean {
     var res = false
     transaction {
+        addLogger(StdOutSqlLogger)
         res = Users.selectAll().map { it[Users.token] }.contains(token)
     }
     return res

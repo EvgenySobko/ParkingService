@@ -25,6 +25,7 @@ data class ParkingLot(
 fun getParking(): String {
     var json = ""
     transaction {
+        addLogger(StdOutSqlLogger)
         val data = Parking.selectAll()
         val list = mutableListOf<ParkingLot>()
         data.map {
@@ -46,6 +47,7 @@ fun getParking(): String {
 fun isCarParkedNow(userId: Int): Boolean {
     var isParkedNow = false
     transaction {
+        addLogger(StdOutSqlLogger)
         val carsParked = Parking.select { Parking.userId eq userId and (Parking.departureTime eq null) }
         if (!carsParked.empty()) isParkedNow = true
     }
@@ -54,6 +56,7 @@ fun isCarParkedNow(userId: Int): Boolean {
 
 fun addParking(carNumber: String) {
     transaction {
+        addLogger(StdOutSqlLogger)
         Parking.insert {
             it[arrivalTime] = DateTimeUtil.getCurrentDateAndTime()
             it[departureTime] = null
@@ -64,6 +67,7 @@ fun addParking(carNumber: String) {
 
 fun addParking(user: User) {
     transaction {
+        addLogger(StdOutSqlLogger)
         Parking.insert {
             it[arrivalTime] = DateTimeUtil.getCurrentDateAndTime()
             it[departureTime] = null
@@ -101,6 +105,7 @@ fun calculateOdd(carNumber: String, sum: Int): Int {
     val userId = getUserId(carNumber)!!
     var odd = 0
     transaction {
+        addLogger(StdOutSqlLogger)
         val parkings = Parking.select { Parking.userId eq userId }.toMutableList()
         parkings.sortByDescending { it[Parking.departureTime] }
         val costSum = parkings.first()[Parking.totalCost]
@@ -112,6 +117,7 @@ fun calculateOdd(carNumber: String, sum: Int): Int {
 fun getReport(): List<Respond.ReportItem> {
     val list = mutableListOf<Respond.ReportItem>()
     transaction {
+        addLogger(StdOutSqlLogger)
         Parking.selectAll().map {
             val user = getUser(it[Parking.userId])!!
             list.add(
