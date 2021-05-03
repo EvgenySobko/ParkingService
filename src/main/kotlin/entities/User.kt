@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import utils.TokenGenerator.genToken
 
-object Users : Table("user") {
+object Users : Table("public.user") {
     val id = integer("id").primaryKey().autoIncrement("public.user_id_seq1")
     val carNumber = text("number")
     val token = varchar("token", 32)
