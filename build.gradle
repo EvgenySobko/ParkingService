@@ -45,6 +45,9 @@ jar {
                 'Main-Class': 'ApplicationKt'
         )
     }
+
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
