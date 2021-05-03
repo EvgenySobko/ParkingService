@@ -41,6 +41,14 @@ test {
     useJUnit()
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'ApplicationKt'
+        )
+    }
+}
+
 getTasksByName("run", false).first().dependsOn('generateJks')
 
 compileKotlin {
