@@ -7,7 +7,7 @@ task stage {
     dependsOn installDist
 }
 
-mainClassName = 'ApplicationKt'
+mainClassName = 'MainKt'
 
 group = 'parking_service'
 version = '1.0'
@@ -41,7 +41,7 @@ test {
 
 task fatJar(type: Jar) {
     manifest {
-        attributes 'Main-Class': 'ApplicationKt'
+        attributes 'Main-Class': 'MainKt'
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar

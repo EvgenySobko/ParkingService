@@ -1,5 +1,3 @@
-@file:JvmName("Application")
-
 import database.DatabaseFactory
 import entities.*
 import io.ktor.application.*
@@ -113,16 +111,4 @@ fun Application.module() {
             }
         }
     }).start(wait = true)
-}
-
-class Main {
-
-    companion object {
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-
-
-        }
-    }
 }
