@@ -7,8 +7,6 @@ task stage {
     dependsOn installDist
 }
 
-mainClassName = 'MainKt'
-
 group = 'parking_service'
 version = '1.0'
 
