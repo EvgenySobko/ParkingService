@@ -53,6 +53,7 @@ fun isTokenValid(userId: Int, userToken: String): Boolean {
         addLogger(StdOutSqlLogger)
         token = Users.slice(Users.token).select { Users.id eq userId }.map { it[Users.token] }.first()
     }
+    println("Correct token is $token, sent $userToken")
     return userToken == token
 }
 
