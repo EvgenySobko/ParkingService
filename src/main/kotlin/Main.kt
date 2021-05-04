@@ -52,7 +52,6 @@ class Main {
         }
 
         private fun Application.module() {
-            install(HttpsRedirect)
             install(Authentication) {
                 basic("auth-basic") {
                     realm = "Access to the '/history' path"
