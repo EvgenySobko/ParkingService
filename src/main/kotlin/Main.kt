@@ -2,6 +2,7 @@ import database.DatabaseFactory
 import entities.*
 import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -33,7 +34,7 @@ class Main {
                     }
                 )
                 keyStore.load(
-                    File("/etc/letsencrypt/live/bulochka.duckdns.org/keystore.jks").inputStream(), "mypass".toCharArray()
+                    File("keystore.jks").inputStream(), "mypass".toCharArray()
                 )
                 val engine = EngineSSLConnectorBuilder(
                     keyStore = keyStore,
@@ -51,6 +52,7 @@ class Main {
         }
 
         private fun Application.module() {
+            install(HttpsRedirect)
             install(Authentication) {
                 basic("auth-basic") {
                     realm = "Access to the '/history' path"
@@ -63,6 +65,7 @@ class Main {
             routing {
                 post("/park") {
                     val token = call.request.headers["auth_token"]
+                    println(call.request.headers)
                     val car = Request.parking(call.receiveText())
                     when (Validator.validate(car.carNumber, token)) {
                         ValidationResult.INV_NUM -> {
