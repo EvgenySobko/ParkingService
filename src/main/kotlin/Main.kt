@@ -34,7 +34,7 @@ class Main {
                     }
                 )
                 keyStore.load(
-                    File("keystore.jks").inputStream(), "mypass".toCharArray()
+                    File("/etc/letsencrypt/live/bulochka.duckdns.org/keystore.jks").inputStream(), "mypass".toCharArray()
                 )
                 val engine = EngineSSLConnectorBuilder(
                     keyStore = keyStore,
