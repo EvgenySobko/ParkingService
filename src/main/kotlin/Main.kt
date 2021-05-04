@@ -63,7 +63,7 @@ class Main {
             }
             routing {
                 post("/park") {
-                    val token = call.request.headers["auth_token"]
+                    val token = call.request.headers[HttpHeaders.Authorization]
                     println(call.request.headers)
                     val car = Request.parking(call.receiveText())
                     when (Validator.validate(car.carNumber, token)) {
@@ -90,7 +90,7 @@ class Main {
                     }
                 }
                 post("/unpark") {
-                    val token = call.request.headers["auth_token"]
+                    val token = call.request.headers[HttpHeaders.Authorization]
                     println(token)
                     val car = Request.parking(call.receiveText())
                     when (Validator.validate(car.carNumber, token)) {
@@ -113,7 +113,7 @@ class Main {
                     }
                 }
                 post("/pay") {
-                    val token = call.request.headers["auth_token"]
+                    val token = call.request.headers[HttpHeaders.Authorization]
                     val payment = Request.payment(call.receiveText())
                     when (Validator.validate(payment.carNumber, token)) {
                         ValidationResult.INV_NUM -> {
